@@ -1,45 +1,52 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Coin.h - Modified for Object Pool System
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Coin.generated.h"
 
-class USceneComponent;
-class UStaticMeshComponent;
 class USphereComponent;
+class UStaticMeshComponent;
 class URotatingMovementComponent;
+class USoundBase;
 
 UCLASS()
 class CPP_ENDLESSRUNNER_API ACoin : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
+
+public:
 	ACoin();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+protected:
+	virtual void BeginPlay() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* SceneComponent;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
-	UStaticMeshComponent* CoinMesh;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USphereComponent* SphereCollider;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UStaticMeshComponent* CoinMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	URotatingMovementComponent* RotatingMovement;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Assets")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
 	USoundBase* OverlapSound;
 
 	UFUNCTION()
-	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+public:
+	// ===== OBJECT POOL SUPPORT =====
+	// This property tracks the coin's ID in the object pool
+	UPROPERTY()
+	int32 PoolObjectID;
+
+	// Helper functions for pool management
+	void SetPoolID(int32 ID) { PoolObjectID = ID; }
+	int32 GetPoolID() const { return PoolObjectID; }
 };
